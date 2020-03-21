@@ -1,0 +1,31 @@
+FROM golang:1.14.0@sha256:40eb5876acf866a593ee68e5f0b48baa2c60a4789c4564346144e646d5aec6d2 AS deps-cached
+
+ARG PROJECT_PATH=/mailback
+WORKDIR ${PROJECT_PATH}
+
+# Copy and install dependencies
+COPY Makefile go.mod go.sum ${PROJECT_PATH}/
+RUN make configure
+
+# Start stage for with all files for building various images
+FROM deps-cached as builder-cached
+
+COPY . .
+
+# Start stage for building
+FROM builder-cached as builder
+
+RUN make build-server
+RUN mkdir -p /build && cp mailback-server /build/
+
+# Last stage with binary only
+FROM scratch
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder build/mailback-server /app/
+COPY public /app/public
+COPY templates /app/templates
+WORKDIR /app
+
+EXPOSE 8080
+ENTRYPOINT ["./mailback-server"]
+LABEL name=mailback-server

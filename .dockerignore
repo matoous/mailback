@@ -1,0 +1,21 @@
+.dockerignore
+.git/
+.gitignore
+.gitlab-ci.yml
+.gitlab/
+.idea/
+conveyance-api
+README.md
+CONTRIBUTING.md
+
+# We don't need dockerfiles inside containers
+Dockerfile
+Dockerfile.*
+
+# Omit Docker Compose configurations
+docker-compose.yml
+
+# Skip kubernetes configuration
+cfg/k8s
+
+tests/

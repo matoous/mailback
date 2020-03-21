@@ -1,0 +1,73 @@
+linters-settings:
+  dupl:
+    threshold: 100
+  gocritic:
+    # Enable multiple checks by tags, run `GL_DEBUG=gocritic golangci-lint` run to see all tags and checks.
+    # Empty list by default. See https://github.com/go-critic/go-critic#usage -> section "Tags".
+    enabled-tags:
+      - performance
+      - diagnostic
+      - style
+    disabled-checks:
+      - emptyStringTest
+      - unnamedResult  # it is experimental currently and doesn't handle typed channels correctly
+  gocyclo:
+    min-complexity: 15
+  golint:
+    min-confidence: 0
+  govet:
+    check-shadowing: true
+  goconst:
+    min-len: 2
+    min-occurrences: 3
+  goimports:
+    local-prefixes: github.com/matoous/mailback
+  lll:
+    line-length: 140
+  maligned:
+    suggest-new: true
+  misspell:
+    locale: US
+
+linters:
+  enable-all: true
+  disable:
+    # prealloc is not recommended by `golangci-lint` developers.
+    - prealloc
+    - maligned
+    - wsl
+    # this triggered linter issues on many places where such usage is ok, such as Gauge.Add(1).
+#    - gomnd
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - goconst
+        - dupl
+        - bodyclose
+        - depguard
+        - gomnd
+
+    - linters:
+        - whitespace
+      text: "unnecessary leading newline"
+
+    - linters:
+        - lll
+      source: "https://[^ ]{100,}"
+
+run:
+  modules-download-mode: readonly
+  timeout: 5m
+
+# output configuration options
+output:
+  # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
+  format: tab
+
+  # print lines of code with issue, default is true
+  print-issued-lines: true
+
+  # print linter name in the end of issue text, default is true
+  print-linter-name: true
